@@ -134,7 +134,7 @@
     </div>
     
     <script>
-        // Check if running as PWA
+        let deferredPrompt;
         const isStandalone = window.navigator.standalone === true || 
                             window.matchMedia('(display-mode: standalone)').matches;
         
@@ -145,6 +145,32 @@
         // Auto-redirect if already installed as PWA
         if (isStandalone) {
             openWebsite();
+        }
+        
+        // Listen for the beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing
+            e.preventDefault();
+            // Store the event for later use
+            deferredPrompt = e;
+            // Show install prompt after a short delay
+            setTimeout(() => {
+                showInstallPrompt();
+            }, 1500);
+        });
+        
+        function showInstallPrompt() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
         }
         
         // Register service worker for offline support
