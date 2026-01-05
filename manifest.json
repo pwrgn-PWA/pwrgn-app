@@ -2,8 +2,8 @@
   "name": "PWRGEN - Access Your Website",
   "short_name": "PWRGEN",
   "description": "Access the PWRGEN website directly from your home screen with one tap",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "https://pwrgncom.super.site/",
+  "scope": "https://pwrgncom.super.site/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#0a7ea4",
@@ -35,7 +35,7 @@
       "name": "Open Website",
       "short_name": "Website",
       "description": "Open the PWRGEN website",
-      "url": "./index.html",
+      "url": "https://pwrgncom.super.site/",
       "icons": [
         {
           "src": "./icon.png",

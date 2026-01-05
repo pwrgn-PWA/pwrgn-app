@@ -104,7 +104,7 @@
             background: #556066;
         }
         
-        .install-instructions {
+        .instructions-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -118,33 +118,32 @@
             padding: 20px;
         }
         
-        .install-instructions.show {
+        .instructions-modal.show {
             display: flex;
         }
         
-        .install-instructions-content {
+        .instructions-content {
             background: white;
             border-radius: 12px;
             padding: 30px;
             max-width: 400px;
-            text-align: center;
             animation: popUp 0.3s ease-out;
         }
         
-        .install-instructions-content h2 {
+        .instructions-content h2 {
             font-size: 24px;
             color: #11181C;
             margin-bottom: 15px;
         }
         
-        .install-instructions-content p {
+        .instructions-content p {
             font-size: 14px;
             color: #687076;
             margin-bottom: 15px;
             text-align: left;
         }
         
-        .install-instructions-content ol {
+        .instructions-content ol {
             text-align: left;
             margin: 15px 0;
             padding-left: 20px;
@@ -153,18 +152,25 @@
             line-height: 1.8;
         }
         
-        .install-instructions-content li {
+        .instructions-content li {
             margin-bottom: 10px;
         }
         
-        .install-instructions-buttons {
+        .instructions-content .highlight {
+            background: #FEF3C7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
+        .instructions-buttons {
             display: flex;
             gap: 12px;
             justify-content: center;
             margin-top: 20px;
         }
         
-        .install-instructions-buttons button {
+        .instructions-buttons button {
             flex: 1;
             padding: 12px 20px;
             border: none;
@@ -175,21 +181,21 @@
             transition: all 0.3s ease;
         }
         
-        .install-instructions-buttons .confirm {
+        .instructions-buttons .confirm {
             background: #0a7ea4;
             color: white;
         }
         
-        .install-instructions-buttons .confirm:active {
+        .instructions-buttons .confirm:active {
             transform: scale(0.98);
         }
         
-        .install-instructions-buttons .cancel {
+        .instructions-buttons .cancel {
             background: #E5E7EB;
             color: #11181C;
         }
         
-        .install-instructions-buttons .cancel:active {
+        .instructions-buttons .cancel:active {
             background: #D1D5DB;
         }
         
@@ -237,25 +243,30 @@
                 color: #9BA1A6;
             }
             
-            .install-instructions-content {
+            .instructions-content {
                 background: #1e2022;
             }
             
-            .install-instructions-content h2 {
+            .instructions-content h2 {
                 color: #ECEDEE;
             }
             
-            .install-instructions-content p,
-            .install-instructions-content ol {
+            .instructions-content p,
+            .instructions-content ol {
                 color: #9BA1A6;
             }
             
-            .install-instructions-buttons .cancel {
+            .instructions-content .highlight {
+                background: #78350F;
+                color: #FCD34D;
+            }
+            
+            .instructions-buttons .cancel {
                 background: #334155;
                 color: #ECEDEE;
             }
             
-            .install-instructions-buttons .cancel:active {
+            .instructions-buttons .cancel:active {
                 background: #475569;
             }
         }
@@ -267,80 +278,54 @@
             <img src="icon.png" alt="PWRGEN Logo">
         </div>
         <h1>PWRGEN</h1>
-        <p>Access your website directly from your home screen</p>
+        <p>Add PWRGEN to your home screen for quick access</p>
         <div class="button-group">
-            <button class="button" id="installBtn" onclick="triggerInstall()">Install App</button>
-            <button class="button button-secondary" onclick="openWebsite()">Open Website</button>
+            <button class="button" onclick="showInstructions()">Add to Home Screen</button>
+            <button class="button button-secondary" onclick="goToWebsite()">Visit Website Now</button>
         </div>
     </div>
     
-    <!-- Installation Instructions Modal -->
-    <div class="install-instructions" id="installInstructions">
-        <div class="install-instructions-content">
-            <h2>Install PWRGEN</h2>
-            <p>Follow these steps to add PWRGEN to your home screen:</p>
+    <!-- Instructions Modal -->
+    <div class="instructions-modal" id="instructionsModal">
+        <div class="instructions-content">
+            <h2>Add PWRGEN to Home Screen</h2>
+            <p>Follow these simple steps:</p>
             <ol>
-                <li>Tap the <strong>menu icon</strong> (three dots) in the top-right corner</li>
-                <li>Select <strong>"Add to Home screen"</strong> or <strong>"Create shortcut"</strong></li>
-                <li>Confirm the installation</li>
-                <li>The PWRGEN icon will appear on your home screen</li>
+                <li>Tap the <span class="highlight">menu icon</span> (three dots) in the top-right corner of Chrome</li>
+                <li>Select <span class="highlight">"Add to Home screen"</span></li>
+                <li>Confirm by tapping <span class="highlight">"Add"</span></li>
+                <li>Done! PWRGEN icon will appear on your home screen</li>
             </ol>
-            <p style="margin-top: 15px; font-size: 13px; color: #9BA1A6;">When you tap the icon, it will open your website in app mode.</p>
-            <div class="install-instructions-buttons">
+            <p style="margin-top: 15px; font-size: 13px; color: #9BA1A6;">When you tap the icon, it will open your PWRGEN website directly.</p>
+            <div class="instructions-buttons">
                 <button class="confirm" onclick="closeInstructions()">Got it!</button>
             </div>
         </div>
     </div>
     
     <script>
-        let deferredPrompt;
+        // Check if already running as installed app
         const isStandalone = window.navigator.standalone === true || 
                             window.matchMedia('(display-mode: standalone)').matches;
         
-        function openWebsite() {
+        // If installed as app, go directly to website
+        if (isStandalone) {
+            goToWebsite();
+        }
+        
+        function goToWebsite() {
             window.location.href = 'https://pwrgncom.super.site/';
         }
         
-        // Auto-redirect if already installed as PWA
-        if (isStandalone) {
-            openWebsite();
-        }
-        
-        // Listen for the beforeinstallprompt event
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-        
-        function triggerInstall() {
-            if (deferredPrompt) {
-                // Use native install prompt if available
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                        // Show instructions as fallback
-                        showInstructions();
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                // Show instructions if native prompt not available
-                showInstructions();
-            }
-        }
-        
         function showInstructions() {
-            document.getElementById('installInstructions').classList.add('show');
+            document.getElementById('instructionsModal').classList.add('show');
         }
         
         function closeInstructions() {
-            document.getElementById('installInstructions').classList.remove('show');
+            document.getElementById('instructionsModal').classList.remove('show');
         }
         
-        // Register service worker for offline support
+        // Register service worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {
                 // Service worker registration failed, but app still works
