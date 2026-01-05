@@ -104,7 +104,7 @@
             background: #556066;
         }
         
-        .install-prompt {
+        .install-instructions {
             display: none;
             position: fixed;
             top: 0;
@@ -118,11 +118,11 @@
             padding: 20px;
         }
         
-        .install-prompt.show {
+        .install-instructions.show {
             display: flex;
         }
         
-        .install-prompt-content {
+        .install-instructions-content {
             background: white;
             border-radius: 12px;
             padding: 30px;
@@ -131,25 +131,40 @@
             animation: popUp 0.3s ease-out;
         }
         
-        .install-prompt-content h2 {
+        .install-instructions-content h2 {
             font-size: 24px;
             color: #11181C;
+            margin-bottom: 15px;
+        }
+        
+        .install-instructions-content p {
+            font-size: 14px;
+            color: #687076;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .install-instructions-content ol {
+            text-align: left;
+            margin: 15px 0;
+            padding-left: 20px;
+            font-size: 14px;
+            color: #687076;
+            line-height: 1.8;
+        }
+        
+        .install-instructions-content li {
             margin-bottom: 10px;
         }
         
-        .install-prompt-content p {
-            font-size: 14px;
-            color: #687076;
-            margin-bottom: 20px;
-        }
-        
-        .install-prompt-buttons {
+        .install-instructions-buttons {
             display: flex;
             gap: 12px;
             justify-content: center;
+            margin-top: 20px;
         }
         
-        .install-prompt-buttons button {
+        .install-instructions-buttons button {
             flex: 1;
             padding: 12px 20px;
             border: none;
@@ -160,21 +175,21 @@
             transition: all 0.3s ease;
         }
         
-        .install-prompt-buttons .confirm {
+        .install-instructions-buttons .confirm {
             background: #0a7ea4;
             color: white;
         }
         
-        .install-prompt-buttons .confirm:active {
+        .install-instructions-buttons .confirm:active {
             transform: scale(0.98);
         }
         
-        .install-prompt-buttons .cancel {
+        .install-instructions-buttons .cancel {
             background: #E5E7EB;
             color: #11181C;
         }
         
-        .install-prompt-buttons .cancel:active {
+        .install-instructions-buttons .cancel:active {
             background: #D1D5DB;
         }
         
@@ -222,24 +237,25 @@
                 color: #9BA1A6;
             }
             
-            .install-prompt-content {
+            .install-instructions-content {
                 background: #1e2022;
             }
             
-            .install-prompt-content h2 {
+            .install-instructions-content h2 {
                 color: #ECEDEE;
             }
             
-            .install-prompt-content p {
+            .install-instructions-content p,
+            .install-instructions-content ol {
                 color: #9BA1A6;
             }
             
-            .install-prompt-buttons .cancel {
+            .install-instructions-buttons .cancel {
                 background: #334155;
                 color: #ECEDEE;
             }
             
-            .install-prompt-buttons .cancel:active {
+            .install-instructions-buttons .cancel:active {
                 background: #475569;
             }
         }
@@ -253,19 +269,25 @@
         <h1>PWRGEN</h1>
         <p>Access your website directly from your home screen</p>
         <div class="button-group">
-            <button class="button" id="installBtn" onclick="triggerInstallPrompt()">Install App</button>
+            <button class="button" id="installBtn" onclick="triggerInstall()">Install App</button>
             <button class="button button-secondary" onclick="openWebsite()">Open Website</button>
         </div>
     </div>
     
-    <!-- Install Prompt Modal -->
-    <div class="install-prompt" id="installPromptModal">
-        <div class="install-prompt-content">
-            <h2>Install PWRGEN?</h2>
-            <p>Add PWRGEN to your home screen for quick access</p>
-            <div class="install-prompt-buttons">
-                <button class="confirm" onclick="confirmInstall()">Install</button>
-                <button class="cancel" onclick="cancelInstall()">Cancel</button>
+    <!-- Installation Instructions Modal -->
+    <div class="install-instructions" id="installInstructions">
+        <div class="install-instructions-content">
+            <h2>Install PWRGEN</h2>
+            <p>Follow these steps to add PWRGEN to your home screen:</p>
+            <ol>
+                <li>Tap the <strong>menu icon</strong> (three dots) in the top-right corner</li>
+                <li>Select <strong>"Add to Home screen"</strong> or <strong>"Create shortcut"</strong></li>
+                <li>Confirm the installation</li>
+                <li>The PWRGEN icon will appear on your home screen</li>
+            </ol>
+            <p style="margin-top: 15px; font-size: 13px; color: #9BA1A6;">When you tap the icon, it will open your website in app mode.</p>
+            <div class="install-instructions-buttons">
+                <button class="confirm" onclick="closeInstructions()">Got it!</button>
             </div>
         </div>
     </div>
@@ -288,34 +310,34 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // Show install button
-            document.getElementById('installBtn').style.display = 'block';
         });
         
-        function triggerInstallPrompt() {
+        function triggerInstall() {
             if (deferredPrompt) {
-                // Show native install prompt
+                // Use native install prompt if available
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                        // Show instructions as fallback
+                        showInstructions();
                     }
                     deferredPrompt = null;
                 });
             } else {
-                // Show custom modal if native prompt not available
-                document.getElementById('installPromptModal').classList.add('show');
+                // Show instructions if native prompt not available
+                showInstructions();
             }
         }
         
-        function confirmInstall() {
-            document.getElementById('installPromptModal').classList.remove('show');
-            // Provide instructions
-            alert('To install PWRGEN:\\n\\n1. Tap the menu (three dots)\\n2. Select "Add to Home screen"\\n3. Confirm installation\\n\\nThe app icon will appear on your home screen!');
+        function showInstructions() {
+            document.getElementById('installInstructions').classList.add('show');
         }
         
-        function cancelInstall() {
-            document.getElementById('installPromptModal').classList.remove('show');
+        function closeInstructions() {
+            document.getElementById('installInstructions').classList.remove('show');
         }
         
         // Register service worker for offline support
