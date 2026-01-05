@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PWRGEN - Access the PWRGEN website">
+    <meta name="theme-color" content="#0a7ea4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PWRGEN">
+    
+    <title>PWRGEN</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        h1 {
+            font-size: 32px;
+            color: #11181C;
+            margin-bottom: 10px;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        p {
+            font-size: 16px;
+            color: #687076;
+            margin-bottom: 30px;
+            animation: slideUp 0.6s ease-out 0.1s both;
+        }
+        
+        .button {
+            display: inline-block;
+            background: #0a7ea4;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s ease, transform 0.2s ease;
+            animation: slideUp 0.6s ease-out 0.2s both;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .button:active {
+            transform: scale(0.98);
+        }
+        
+        .button:hover {
+            background: #085a8a;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #151718;
+            }
+            
+            h1 {
+                color: #ECEDEE;
+            }
+            
+            p {
+                color: #9BA1A6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="icon.png" alt="PWRGEN Logo">
+        </div>
+        <h1>PWRGEN</h1>
+        <p>Access your website directly from your home screen</p>
+        <button class="button" onclick="openWebsite()">Open Website</button>
+    </div>
+    
+    <script>
+        // Check if running as PWA
+        const isStandalone = window.navigator.standalone === true || 
+                            window.matchMedia('(display-mode: standalone)').matches;
+        
+        function openWebsite() {
+            window.location.href = 'https://pwrgncom.super.site/';
+        }
+        
+        // Auto-redirect if already installed as PWA
+        if (isStandalone) {
+            openWebsite();
+        }
+        
+        // Register service worker for offline support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {
+                // Service worker registration failed, but app still works
+            });
+        }
+    </script>
+</body>
+</html>
