@@ -65,6 +65,13 @@
             animation: slideUp 0.6s ease-out 0.1s both;
         }
         
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: slideUp 0.6s ease-out 0.2s both;
+        }
+        
         .button {
             display: inline-block;
             background: #0a7ea4;
@@ -75,7 +82,6 @@
             font-size: 16px;
             font-weight: 600;
             transition: background 0.3s ease, transform 0.2s ease;
-            animation: slideUp 0.6s ease-out 0.2s both;
             border: none;
             cursor: pointer;
         }
@@ -86,6 +92,90 @@
         
         .button:hover {
             background: #085a8a;
+        }
+        
+        .button-secondary {
+            background: #687076;
+            font-size: 14px;
+            padding: 12px 24px;
+        }
+        
+        .button-secondary:hover {
+            background: #556066;
+        }
+        
+        .install-prompt {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .install-prompt.show {
+            display: flex;
+        }
+        
+        .install-prompt-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            animation: popUp 0.3s ease-out;
+        }
+        
+        .install-prompt-content h2 {
+            font-size: 24px;
+            color: #11181C;
+            margin-bottom: 10px;
+        }
+        
+        .install-prompt-content p {
+            font-size: 14px;
+            color: #687076;
+            margin-bottom: 20px;
+        }
+        
+        .install-prompt-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .install-prompt-buttons button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .install-prompt-buttons .confirm {
+            background: #0a7ea4;
+            color: white;
+        }
+        
+        .install-prompt-buttons .confirm:active {
+            transform: scale(0.98);
+        }
+        
+        .install-prompt-buttons .cancel {
+            background: #E5E7EB;
+            color: #11181C;
+        }
+        
+        .install-prompt-buttons .cancel:active {
+            background: #D1D5DB;
         }
         
         @keyframes fadeIn {
@@ -108,6 +198,17 @@
             }
         }
         
+        @keyframes popUp {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
         @media (prefers-color-scheme: dark) {
             body {
                 background: #151718;
@@ -120,6 +221,27 @@
             p {
                 color: #9BA1A6;
             }
+            
+            .install-prompt-content {
+                background: #1e2022;
+            }
+            
+            .install-prompt-content h2 {
+                color: #ECEDEE;
+            }
+            
+            .install-prompt-content p {
+                color: #9BA1A6;
+            }
+            
+            .install-prompt-buttons .cancel {
+                background: #334155;
+                color: #ECEDEE;
+            }
+            
+            .install-prompt-buttons .cancel:active {
+                background: #475569;
+            }
         }
     </style>
 </head>
@@ -130,7 +252,22 @@
         </div>
         <h1>PWRGEN</h1>
         <p>Access your website directly from your home screen</p>
-        <button class="button" onclick="openWebsite()">Open Website</button>
+        <div class="button-group">
+            <button class="button" id="installBtn" onclick="triggerInstallPrompt()">Install App</button>
+            <button class="button button-secondary" onclick="openWebsite()">Open Website</button>
+        </div>
+    </div>
+    
+    <!-- Install Prompt Modal -->
+    <div class="install-prompt" id="installPromptModal">
+        <div class="install-prompt-content">
+            <h2>Install PWRGEN?</h2>
+            <p>Add PWRGEN to your home screen for quick access</p>
+            <div class="install-prompt-buttons">
+                <button class="confirm" onclick="confirmInstall()">Install</button>
+                <button class="cancel" onclick="cancelInstall()">Cancel</button>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -149,28 +286,36 @@
         
         // Listen for the beforeinstallprompt event
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing
             e.preventDefault();
-            // Store the event for later use
             deferredPrompt = e;
-            // Show install prompt after a short delay
-            setTimeout(() => {
-                showInstallPrompt();
-            }, 1500);
+            // Show install button
+            document.getElementById('installBtn').style.display = 'block';
         });
         
-        function showInstallPrompt() {
+        function triggerInstallPrompt() {
             if (deferredPrompt) {
+                // Show native install prompt
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
                     }
                     deferredPrompt = null;
                 });
+            } else {
+                // Show custom modal if native prompt not available
+                document.getElementById('installPromptModal').classList.add('show');
             }
+        }
+        
+        function confirmInstall() {
+            document.getElementById('installPromptModal').classList.remove('show');
+            // Provide instructions
+            alert('To install PWRGEN:\\n\\n1. Tap the menu (three dots)\\n2. Select "Add to Home screen"\\n3. Confirm installation\\n\\nThe app icon will appear on your home screen!');
+        }
+        
+        function cancelInstall() {
+            document.getElementById('installPromptModal').classList.remove('show');
         }
         
         // Register service worker for offline support
